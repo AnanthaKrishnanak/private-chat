@@ -1,9 +1,31 @@
 "use client";
 
 import { useUserName } from "@/hooks/useUserName";
+import client from "@/lib/client";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 function IdentityCard() {
   const { userName } = useUserName();
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+
+  const { mutate: createRoom } = useMutation({
+    mutationFn: async () => {
+      setError(null);
+      const { data } = await client.api.rooms.create.post();
+      return data;
+    },
+    onSuccess: (data) => {
+      if (data?.roomId) {
+        router.push(`/room/${data.roomId}`);
+      }
+    },
+    onError: (error) => {
+      setError(error.message);
+    },
+  });
 
   return (
     <div className="w-full max-w-md p-8 rounded-2xl bg-neutral-900 border border-neutral-800 shadow-xl">
@@ -20,9 +42,12 @@ function IdentityCard() {
       <button
         className="w-full py-3 mt-3 bg-white text-black font-semibold tracking-wide uppercase rounded-none 
                      hover:bg-neutral-200 transition-all"
+        onClick={() => createRoom()}
       >
         Create Secure Room
       </button>
+
+      {error && <p className="text-red-500 mt-6 text-center">{error}</p>}
     </div>
   );
 }
