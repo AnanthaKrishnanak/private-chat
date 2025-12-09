@@ -1,9 +1,8 @@
 "use client";
 
+import { Check, Copy, Lock, Timer, Trash2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import React, { useState } from "react";
-import { Copy, Check } from "lucide-react";
-import { cn } from "@/lib/cn";
 
 function formatTimeRemaining(timeRemaining: number) {
   const minutes = Math.floor(timeRemaining / 60);
@@ -14,7 +13,6 @@ function formatTimeRemaining(timeRemaining: number) {
 function Layout({ children }: { children: React.ReactNode }) {
   const { roomId } = useParams();
   const [copied, setCopied] = useState(false);
-  const timeRemaining = 10;
 
   const handleCopy = async () => {
     try {
@@ -28,49 +26,67 @@ function Layout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <main className="h-screen flex flex-col max-h-screen overflow-hidden">
-      <header className="border-b border-zinc-800 p-4 flex items-center justify-between bg-zinc-900/30">
-        <div className="flex gap-4">
-          <div className="flex flex-col">
-            <h3 className="text-xs text-zinc-500">ROOM ID:</h3>
+    <main className="bg-zinc-950 text-zinc-200 h-screen flex flex-col overflow-hidden">
+      <header className="flex-none border-b border-white/5 bg-zinc-950/50 backdrop-blur-md z-10">
+        <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2 text-zinc-500">
+              <span className="text-xs font-medium uppercase">Room ID</span>
+              <Lock className="w-3 h-3" />
+            </div>
 
-            <div className="flex items-center gap-2">
-              <p className="text-green-500">{roomId}</p>
-
-              <button
-                onClick={handleCopy}
-                className="text-zinc-400 hover:text-white transition-colors"
-                aria-label="Copy room URL"
-              >
-                {copied ? <Check size={16} /> : <Copy size={16} />}
-              </button>
+            <div className="flex items-center gap-3 group cursor-pointer">
+              <span className="font-mono text-emerald-400 text-lg">
+                {roomId}
+              </span>
+              {copied ? (
+                <Check className="w-4 h-4 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+              ) : (
+                <Copy
+                  className="w-4 h-4 text-zinc-600 group-hover:text-zinc-400 transition-colors"
+                  onClick={handleCopy}
+                />
+              )}
             </div>
           </div>
-          <div className="h-8 w-px bg-zinc-800" />
-          <div className="flex flex-col">
-            <span className="text-xs text-zinc-500 uppercase">
-              SELF- DESTRUCT:
+
+          <div className="hidden md:flex flex-col items-center">
+            <span className="text-xs font-medium text-zinc-500 uppercase mb-1">
+              Auto-Destruct
             </span>
-            <span
-              className={cn(
-                "text-sm font-bold flex items-center gap-2",
-                timeRemaining !== null && timeRemaining < 60
-                  ? "text-red-500"
-                  : "text-amber-500"
-              )}
-            >
-              {timeRemaining ? formatTimeRemaining(timeRemaining) : "--:--:--"}
+            <div className="flex items-center gap-2 text-rose-500 bg-rose-500/10 px-3 py-1 rounded-full border border-rose-500/20">
+              <Timer className="w-4 h-4 animate-pulse" />
+              <span className="font-mono text-lg font-medium tracking-widest">
+                00:10:00
+              </span>
+            </div>
+          </div>
+
+          <button className="group flex items-center gap-2 px-4 py-2 bg-zinc-900 hover:bg-rose-950/30 border border-zinc-800 hover:border-rose-500/30 text-zinc-400 hover:text-rose-400 rounded-lg transition-all">
+            <span className="text-sm">DESTROY</span>
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="flex items-center justify-between px-6 py-2 bg-zinc-900/30 border-t border-white/5">
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
+            <span className="text-sm text-zinc-400">
+              Encrypted connection established
+            </span>
+            <span className="text-zinc-700 mx-2">•</span>
+            <span className="text-sm text-zinc-500"></span>
+          </div>
+          <div className="md:hidden text-rose-500 font-mono text-sm">
+            00:10:00
           </div>
         </div>
-        <button className="text-zinc-400 bg-zinc-800 hover:text-white  hover:bg-red-700 px-3 py-1.5 transition-all uppercase ">
-          Destroy Now
-        </button>
       </header>
 
-      <div className="flex-1 overflow-hidden">
-        {children}
-      </div>
+      {children}
     </main>
   );
 }

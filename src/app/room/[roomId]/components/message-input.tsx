@@ -1,68 +1,49 @@
 "use client";
-import { Send } from "lucide-react";
-import { useRef, useState } from "react";
 
-interface MessageInputProps {
-  onSendMessage: (message: string) => void;
-  isPending?: boolean;
-}
+import { ArrowUp, ArrowRight } from "lucide-react";
+import { useState } from "react";
 
-const MessageInput = ({ onSendMessage, isPending }: MessageInputProps) => {
-  const [message, setMessage] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
+export default function MessageInput({
+  onSend,
+}: {
+  onSend: (t: string) => void;
+}) {
+  const [text, setText] = useState("");
 
-  const handleSend = () => {
-    if (!message.trim()) return;
-    onSendMessage(message);
-    setMessage("");
-    inputRef.current?.focus();
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && message.trim() && !isPending) {
-      handleSend();
-    }
+  const handleSubmit = () => {
+    onSend(text);
+    setText("");
   };
 
   return (
-    <div className="border-t border-zinc-800/80 bg-zinc-900/60 backdrop-blur-xl p-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-end gap-3">
-          <div className="flex-1 relative">
-            <input
-              ref={inputRef}
-              value={message}
-              autoFocus
-              type="text"
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={handleKeyDown}
-              disabled={isPending}
-              className="w-full bg-zinc-800/80 text-white placeholder-zinc-500 
-                         px-5 py-3.5 rounded-2xl border border-zinc-700/50
-                         focus:outline-none focus:ring-2 focus:ring-green-600/50 focus:border-green-600/50
-                         disabled:opacity-50 disabled:cursor-not-allowed
-                         transition-all duration-200"
-              placeholder="Type a message..."
-            />
-          </div>
-
-          <button
-            onClick={handleSend}
-            disabled={!message.trim() || isPending}
-            className="p-3.5 rounded-2xl bg-linear-to-br from-green-600 to-green-700
-                       hover:from-green-500 hover:to-green-600
-                       disabled:from-zinc-700 disabled:to-zinc-700 disabled:cursor-not-allowed
-                       transition-all duration-200 text-white flex items-center justify-center
-                       shadow-lg shadow-green-600/20 hover:shadow-green-600/30
-                       disabled:shadow-none active:scale-95"
-            aria-label="Send Message"
-          >
-            <Send size={20} className={isPending ? "animate-pulse" : ""} />
-          </button>
+    <footer className="flex-none bg-zinc-950/80 backdrop-blur-xl border-t border-white/5 p-4 md:p-6 pb-8">
+      <div className="max-w-5xl mx-auto relative">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 cursor-pointer">
+          <ArrowRight className="w-5 h-5" />
         </div>
-      </div>
-    </div>
-  );
-};
 
-export default MessageInput;
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+          placeholder="Type a secure message..."
+          className="w-full bg-zinc-900/50 border border-zinc-800 text-zinc-200 text-lg placeholder-zinc-600 pl-12 pr-14 py-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500/30 shadow-lg"
+        />
+
+        <button
+          onClick={handleSubmit}
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg shadow-lg transition-all group"
+        >
+          <ArrowUp className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
+        </button>
+      </div>
+
+      <div className="max-w-5xl mx-auto mt-3 text-center">
+        <p className="text-xs text-zinc-600">
+          Messages are end-to-end encrypted and self-destruct after session
+          expiry.
+        </p>
+      </div>
+    </footer>
+  );
+}
