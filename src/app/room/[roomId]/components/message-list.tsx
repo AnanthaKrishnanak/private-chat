@@ -1,6 +1,7 @@
 "use client";
 
 import { Message } from "@/schema";
+import { useRef, useEffect } from "react";
 
 export default function MessageList({
   messages,
@@ -9,6 +10,12 @@ export default function MessageList({
   messages: Message[];
   currentUser: string;
 }) {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   return (
     <main className="flex-1 overflow-y-auto p-4 md:p-6 space-y-8 scroll-smooth pb-8 ">
       <div className="flex justify-center">
@@ -60,19 +67,21 @@ export default function MessageList({
               }`}
             >
               <div
-                className={`px-5 py-3 rounded-2xl shadow-sm max-w-[90%] md:max-w-xl relative group 
+                className={`px-5 py-3 rounded-2xl shadow-sm max-w-[90%] md:max-w-xl relative group  min-w-40
                   ${
                     outgoing
                       ? "bg-emerald-600 text-white rounded-tr-sm"
                       : "bg-zinc-900 border border-zinc-800 text-zinc-100 rounded-tl-sm"
                   }`}
               >
-                <p className="text-lg font-light leading-relaxed">{msg.text}</p>
+                <p className="text-lg font-light leading-relaxed mb-1">
+                  {msg.text}
+                </p>
 
                 <span
-                  className={`absolute bottom-2 text-xs text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity
-                    ${outgoing ? "-left-12" : "-right-12"}
-                  `}
+                  className={`text-[10px] block mt-1 ${
+                    outgoing ? "text-emerald-200/70" : "text-zinc-500"
+                  }`}
                 >
                   {time}
                 </span>
@@ -81,6 +90,8 @@ export default function MessageList({
           </div>
         );
       })}
+
+      <div ref={messagesEndRef} />
     </main>
   );
 }

@@ -6,13 +6,15 @@ import client from "@/lib/client";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { Loader } from "lucide-react";
+import { EncryptedText } from "@/components/ui/encrypted-text";
 
 function IdentityCard() {
   const { userName } = useUserName();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
-  const { mutate: createRoom } = useMutation({
+  const { mutate: createRoom, isPending } = useMutation({
     mutationFn: async () => {
       setError(null);
       const { data } = await client.api.rooms.create.post();
@@ -20,7 +22,7 @@ function IdentityCard() {
     },
     onSuccess: (data) => {
       if (data?.roomId) {
-        router.push(`/room/${data.roomId}`);
+        router.replace(`/room/${data.roomId}`);
       }
     },
     onError: (error) => {
@@ -29,23 +31,29 @@ function IdentityCard() {
   });
 
   return (
-    <div className="w-full max-w-md p-8 rounded-2xl bg-neutral-900 border border-neutral-800 shadow-xl">
+    <div className="w-full max-w-lg p-8 rounded-2xl bg-neutral-900 border border-neutral-800 shadow-xl">
       <div className="mb-6">
         <h2 className="text-neutral-300 text-sm uppercase tracking-wider">
           Your Identity
         </h2>
 
-        <p className="mt-2 font-mono text-lg text-neutral-100 bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 select-none">
-          {userName}
+        <p className="mt-2 font-mono text-lg text-neutral-100 bg-neutral-800 px-4 py-2 rounded-lg border border-neutral-700 select-none text-nowrap">
+          <EncryptedText
+            text={userName ?? "Loading..."}
+            encryptedClassName="text-neutral-500"
+            revealedClassName="dark:text-white text-black"
+            revealDelayMs={50}
+          />
         </p>
       </div>
 
       <button
-        className="w-full py-3 mt-3 bg-white text-black font-semibold tracking-wide uppercase rounded-none 
-                     hover:bg-neutral-200 transition-all"
-        onClick={() => createRoom()}
+        className="w-full flex items-center gap-2 justify-center bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs tracking-widest py-4 rounded-lg transition-all duration-200 uppercase hover:shadow-lg hover:shadow-zinc-100/10 active:scale-[0.98] cursor-pointer"
+        onClick={() => !isPending && createRoom()}
+        disabled={isPending}
       >
         Create Secure Room
+        {isPending && <Loader className="animate-spin h-4 w-4" />}
       </button>
 
       {error && <p className="text-red-500 mt-6 text-center">{error}</p>}

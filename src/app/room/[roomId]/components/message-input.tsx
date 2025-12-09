@@ -11,6 +11,7 @@ export default function MessageInput({
   const [text, setText] = useState("");
 
   const handleSubmit = () => {
+    if (!text.trim()) return;
     onSend(text);
     setText("");
   };

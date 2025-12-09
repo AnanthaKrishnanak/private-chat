@@ -3,6 +3,7 @@ import { Fira_Code } from "next/font/google";
 
 import "./globals.css";
 import Providers from "@/components/providers";
+import { Suspense } from "react";
 
 const firaCode = Fira_Code({
   subsets: ["latin"],
@@ -21,8 +22,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${firaCode.variable}  antialiased`}>
-        <Providers>{children}</Providers>
+      <body className={`${firaCode.variable} dark  antialiased`}>
+        <Suspense>
+          <Providers>{children}</Providers>
+        </Suspense>
       </body>
     </html>
   );
