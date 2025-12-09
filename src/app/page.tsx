@@ -1,9 +1,10 @@
 "use client";
 
+import ErrorDisplay from "@/components/error-display";
 import { useUserName } from "@/hooks/useUserName";
 import client from "@/lib/client";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 function IdentityCard() {
@@ -52,10 +53,34 @@ function IdentityCard() {
   );
 }
 
+const errorMap: Record<string, { title: string; description: string }> = {
+  "room-destroyed": {
+    title: "Room Destroyed",
+    description: "The room has been destroyed",
+  },
+  "room-not-found": {
+    title: "Room Not Found",
+    description: "The room does not exist",
+  },
+  "room-full": {
+    title: "Room Full",
+    description: "The room is full. Create a new room",
+  },
+};
 export default function Home() {
+  const searchParams = useSearchParams();
+  const error = searchParams.get("error");
+  const errorMetaData = error && errorMap[error];
+
   return (
     <main className="flex min-h-screen flex-col justify-center items-center p-4">
       <div className="w-full max-w-md space-y-8">
+        {errorMetaData && (
+          <ErrorDisplay
+            title={errorMetaData.title}
+            description={errorMetaData.description}
+          />
+        )}
         <div className="border-zinc-800">
           <IdentityCard />
         </div>
