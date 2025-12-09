@@ -22,12 +22,12 @@ export const authMiddleWare = new Elysia({ name: "auth" })
     const roomId = query.roomId as string | undefined;
     if (!token || !roomId) throw new AuthError("Missing token or roomId");
 
-    const connectedUsers = await redis.hget<string[]>(
-      `meta-${roomId}`,
-      "connectedUsers"
-    );
-    if (!connectedUsers || !connectedUsers.includes(token))
+    const roomMetaData = await redis.hgetall<{
+      connectedUsers: string[];
+      createdAt: number;
+    }>(`meta-${roomId}`);
+    if (!roomMetaData || !roomMetaData.connectedUsers.includes(token))
       throw new AuthError("Invalid token ");
 
-    return { auth: { token, roomId, connectedUsers } };
+    return { auth: { token, roomId, roomMetaData } };
   });

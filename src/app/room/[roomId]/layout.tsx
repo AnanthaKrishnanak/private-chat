@@ -68,7 +68,7 @@ function Layout({ children }: { children: React.ReactNode }) {
         </button>
       </header>
 
-      <div className="flex-1 overflow-y-scroll p-4 space-y-4 scrollbar-thin">
+      <div className="flex-1 overflow-hidden">
         {children}
       </div>
     </main>

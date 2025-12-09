@@ -2,6 +2,8 @@ import { redis } from "@/lib/redis";
 import { Elysia, t } from "elysia";
 import { nanoid } from "nanoid";
 import { authMiddleWare } from "./auth";
+import z from "zod";
+import { Message, messageSchema } from "@/schema";
 
 const TIME_TO_LIVE = 60 * 10; // 10 minutes
 
@@ -22,11 +24,40 @@ const rooms = new Elysia({ prefix: "/rooms" }).post("/create", async () => {
 
 const messages = new Elysia({ prefix: "/messages" })
   .use(authMiddleWare)
-  .post("/", async ({ auth, body }) => {
-    const roomId = auth.roomId;
+  .post(
+    "/",
+    async ({ auth, body }) => {
+      const { roomId, roomMetaData, token } = auth;
+      const { text, sender } = body;
+
+      const message: Message = {
+        id: nanoid(),
+        text,
+        sender,
+        timeStamp: Date.now(),
+        roomId,
+        token,
+      };
+
+      await redis.rpush(`messages-${roomId}`, { ...message });
+
+      const remaining = await redis.ttl(`meta-${roomId}`);
+      await redis.expire(`messages-${roomId}`, remaining);
+    },
+    {
+      query: z.object({
+        roomId: z.string(),
+      }),
+      body: messageSchema.pick({ text: true, sender: true }),
+    }
+  )
+  .get("/", async ({ auth }) => {
+    const { roomId } = auth;
+    const messages = await redis.lrange<Message>(`messages-${roomId}`, 0, -1);
+    return messages;
   });
 
-const app = new Elysia({ prefix: "/api" }).use(rooms);
+const app = new Elysia({ prefix: "/api" }).use(rooms).use(messages);
 
 export type App = typeof app;
 
