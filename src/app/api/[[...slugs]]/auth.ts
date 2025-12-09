@@ -1,6 +1,5 @@
 import { redis } from "@/lib/redis";
 import Elysia from "elysia";
-import { connect } from "http2";
 
 class AuthError extends Error {
   constructor(message: string) {

@@ -6,6 +6,7 @@ import { useTTL } from "@/hooks/useTTL";
 import { Check, Copy, Lock, Trash2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import React, { useState } from "react";
+import DestroyRoom from "./components/destroy";
 
 function Layout({ children }: { children: React.ReactNode }) {
   const { roomId } = useParams();
@@ -56,11 +57,7 @@ function Layout({ children }: { children: React.ReactNode }) {
             </span>
             <Timer />
           </div>
-
-          <button className="group flex items-center gap-2 px-4 py-2 bg-zinc-900 hover:bg-rose-950/30 border border-zinc-800 hover:border-rose-500/30 text-zinc-400 hover:text-rose-400 rounded-lg transition-all">
-            <span className="text-sm">DESTROY</span>
-            <Trash2 className="w-4 h-4" />
-          </button>
+          <DestroyRoom />
         </div>
 
         <div className="flex items-center justify-between px-6 py-2 bg-zinc-900/30 border-t border-white/5">
