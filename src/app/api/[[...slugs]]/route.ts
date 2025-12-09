@@ -4,11 +4,13 @@ import { Elysia } from "elysia";
 import { nanoid } from "nanoid";
 import z from "zod";
 import { authMiddleWare } from "./auth";
+import { realtime } from "@/lib/realtime";
 
 const TIME_TO_LIVE = 60 * 10;
 
-const getRoomKey = (roomId: string) => `meta-${roomId}`;
-const getMessagesKey = (roomId: string) => `messages-${roomId}`;
+export const getRoomKey = (roomId: string) => `meta:${roomId}`;
+export const getMessagesKey = (roomId: string) => `messages:${roomId}`;
+export const getHistoryKey = (roomId: string) => `history:${roomId}`;
 
 const createRoom = async () => {
   const roomId = nanoid();
@@ -32,7 +34,11 @@ const deleteRoom = async (roomId: string) => {
   await Promise.all([
     redis.del(getMessagesKey(roomId)),
     redis.del(getRoomKey(roomId)),
+    redis.del(getHistoryKey(roomId)),
   ]);
+
+  await realtime.channel(roomId).emit("chat.destroyRoom", { isDeleted: true });
+
   return { success: true };
 };
 
@@ -53,13 +59,16 @@ const createMessage = async (
 
   const messagesKey = getMessagesKey(roomId);
   const roomKey = getRoomKey(roomId);
+  const historyKey = getHistoryKey(roomId);
 
   await redis.rpush(messagesKey, message);
+  await realtime.channel(roomId).emit("chat.message", message);
 
   const remaining = await redis.ttl(roomKey);
   await Promise.all([
     redis.expire(messagesKey, remaining),
     redis.expire(roomKey, remaining),
+    redis.expire(historyKey, remaining),
   ]);
 
   return message;
@@ -74,6 +83,11 @@ const roomIdQuery = z.object({ roomId: z.string() });
 const messageBody = messageSchema.pick({ text: true, sender: true });
 
 const rooms = new Elysia({ prefix: "/rooms" })
+  .ws("/ws", {
+    message(ws, message) {
+      ws.send(message);
+    },
+  })
   .post("/create", createRoom)
   .use(authMiddleWare)
   .get("/ttl", ({ query }) => getRoomTTL(query.roomId), {

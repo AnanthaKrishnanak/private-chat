@@ -1,5 +1,6 @@
 import { redis } from "@/lib/redis";
 import Elysia from "elysia";
+import { getRoomKey } from "./route";
 
 class AuthError extends Error {
   constructor(message: string) {
@@ -24,7 +25,7 @@ export const authMiddleWare = new Elysia({ name: "auth" })
     const roomMetaData = await redis.hgetall<{
       connectedUsers: string[];
       createdAt: number;
-    }>(`meta-${roomId}`);
+    }>(getRoomKey(roomId));
     if (!roomMetaData || !roomMetaData.connectedUsers.includes(token))
       throw new AuthError("Invalid token ");
 

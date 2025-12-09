@@ -15,6 +15,5 @@ export const useMessages = () => {
       });
       return data ?? [];
     },
-    refetchInterval: 2000,
   });
 };

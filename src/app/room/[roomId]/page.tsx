@@ -1,20 +1,20 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import { useEffect, useRef } from "react";
-import { useMutation } from "@tanstack/react-query";
-import client from "@/lib/client";
-import { useUserName } from "@/hooks/useUserName";
-import MessageDisplay from "@/app/room/[roomId]/components/message-list";
 import MessageInput from "@/app/room/[roomId]/components/message-input";
+import MessageDisplay from "@/app/room/[roomId]/components/message-list";
 import { useMessages } from "@/hooks/useMessages";
+import { useUserName } from "@/hooks/useUserName";
+import client from "@/lib/client";
+import { useRealtime } from "@/lib/realtime-client";
+import { useMutation } from "@tanstack/react-query";
+import { useParams, useRouter } from "next/navigation";
 
 const Room = () => {
   const { roomId } = useParams();
   const { userName } = useUserName();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { replace } = useRouter();
 
-  const { data: messages, isLoading } = useMessages();
+  const { data: messages, isLoading, refetch } = useMessages();
   const { mutate: sendMessage, isPending } = useMutation({
     mutationFn: async (messageText: string) => {
       await client.api.messages.post(
@@ -31,9 +31,19 @@ const Room = () => {
     },
   });
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  useRealtime({
+    channels: [roomId as string],
+    events: ["chat.message", "chat.destroyRoom"],
+    onData: (data) => {
+      if (data.event === "chat.message") {
+        refetch();
+      }
+
+      if (data.event === "chat.destroyRoom") {
+        replace("/?error=room-destroyed");
+      }
+    },
+  });
 
   return (
     <>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { redis } from "./lib/redis";
 import { nanoid } from "nanoid";
+import { getRoomKey } from "./app/api/[[...slugs]]/route";
 
 const MAX_USERS = 2;
 
@@ -44,11 +45,11 @@ const redirect = (req: NextRequest, to: string) =>
 
 const getRoomMeta = (roomId: string) =>
   redis.hgetall<{ createdAt: number; connectedUsers: string[] }>(
-    `meta-${roomId}`
+    getRoomKey(roomId)
   );
 
 const updateConnectedUsers = (roomId: string, users: string[]) =>
-  redis.hset(`meta-${roomId}`, { connectedUsers: users });
+  redis.hset(getRoomKey(roomId), { connectedUsers: users });
 
 const setUserToken = (response: NextResponse, token: string) => {
   response.cookies.set("token", token, {
