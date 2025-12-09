@@ -1,5 +1,6 @@
 "use client";
 
+import { useMessages } from "@/hooks/useMessages";
 import { Check, Copy, Lock, Timer, Trash2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import React, { useState } from "react";
@@ -13,6 +14,8 @@ function formatTimeRemaining(timeRemaining: number) {
 function Layout({ children }: { children: React.ReactNode }) {
   const { roomId } = useParams();
   const [copied, setCopied] = useState(false);
+
+  const { data: messages = [], isLoading } = useMessages();
 
   const handleCopy = async () => {
     try {
@@ -78,7 +81,9 @@ function Layout({ children }: { children: React.ReactNode }) {
               Encrypted connection established
             </span>
             <span className="text-zinc-700 mx-2">•</span>
-            <span className="text-sm text-zinc-500"></span>
+            <span className="text-sm text-zinc-500">
+              {messages.length} messages
+            </span>
           </div>
           <div className="md:hidden text-rose-500 font-mono text-sm">
             00:10:00

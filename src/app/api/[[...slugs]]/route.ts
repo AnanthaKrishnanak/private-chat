@@ -54,7 +54,10 @@ const messages = new Elysia({ prefix: "/messages" })
   .get("/", async ({ auth }) => {
     const { roomId } = auth;
     const messages = await redis.lrange<Message>(`messages-${roomId}`, 0, -1);
-    return messages;
+    return messages.map((m) => {
+      const { token, ...rest } = m;
+      return rest;
+    });
   });
 
 const app = new Elysia({ prefix: "/api" }).use(rooms).use(messages);
