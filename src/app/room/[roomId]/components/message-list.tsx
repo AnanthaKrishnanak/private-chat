@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import { Message } from "@/schema";
 import { useRef, useEffect } from "react";
 
@@ -35,14 +36,16 @@ export default function MessageList({
         return (
           <div
             key={msg.id}
-            className={`flex flex-col  gap-1 max-w-5xl mx-auto  ${
-              outgoing ? "self-end items-end" : ""
-            }`}
+            className={cn(
+              "flex flex-col gap-1 max-w-5xl mx-auto",
+              outgoing && "self-end items-end"
+            )}
           >
             <div
-              className={`flex items-center gap-2 mb-1 ${
+              className={cn(
+                "flex items-center gap-2 mb-1",
                 outgoing ? "pr-1" : "pl-1"
-              }`}
+              )}
             >
               {outgoing ? (
                 <>
@@ -62,30 +65,25 @@ export default function MessageList({
             </div>
 
             <div
-              className={`flex flex-col gap-2 items-${
-                outgoing ? "end" : "start"
-              }`}
+              className={cn(
+                "px-5 py-3 rounded-2xl shadow-sm max-w-[90%] md:max-w-xl relative group min-w-40",
+                outgoing
+                  ? "bg-linear-to-tr from-emerald-500 to-teal-500 text-white rounded-tr-sm"
+                  : "bg-linear-to-tr from-indigo-500 to-purple-500 text-white rounded-tl-sm"
+              )}
             >
-              <div
-                className={`px-5 py-3 rounded-2xl shadow-sm max-w-[90%] md:max-w-xl relative group  min-w-40
-                  ${
-                    outgoing
-                      ? "bg-emerald-600 text-white rounded-tr-sm"
-                      : "bg-zinc-900 border border-zinc-800 text-zinc-100 rounded-tl-sm"
-                  }`}
-              >
-                <p className="text-lg font-light leading-relaxed mb-1">
-                  {msg.text}
-                </p>
+              <p className="text-lg font-light leading-relaxed mb-1">
+                {msg.text}
+              </p>
 
-                <span
-                  className={`text-[10px] block mt-1 ${
-                    outgoing ? "text-emerald-200/70" : "text-zinc-500"
-                  }`}
-                >
-                  {time}
-                </span>
-              </div>
+              <span
+                className={cn(
+                  "text-[10px] block mt-1",
+                  outgoing ? "text-emerald-200/70" : "text-purple-200/70"
+                )}
+              >
+                {time}
+              </span>
             </div>
           </div>
         );

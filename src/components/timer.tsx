@@ -1,7 +1,7 @@
 "use client";
 
 import { useTTL } from "@/hooks/useTTL";
-import { cn } from "@/lib/cn";
+import { cn } from "@/lib/utils";
 import { Timer as TimerIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
