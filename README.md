@@ -1,8 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 Private Chat – Secure, Fast & Anonymous
 
-## Getting Started
+A privacy-first real-time chat application built with Next.js. Experience truly anonymous messaging with auto-destructing rooms and ephemeral storage.
 
-First, run the development server:
+---
+
+## 🔥 Features
+
+### ⚡ Real-Time Messaging
+Instant message delivery using modern WebSocket-based communication.
+
+### 🔒 Anonymous Chat
+No login. No signup. No personal data. Users can join and chat with complete anonymity.
+
+### 🗄️ Ephemeral Storage (Redis)
+Messages are temporarily stored in Redis for fast access. Nothing is written to long-term storage or databases.
+
+### 💥 Auto-Destruct Rooms
+Every chat room automatically self-destructs, removing:
+- The room
+- All messages inside it
+- All associated metadata
+
+When a room reaches its auto-cleanup condition (e.g., no activity or timeout), all Redis keys are deleted.
+
+### ⏳ Auto-Delete Messages
+Messages automatically expire and are removed from Redis after 10 minutes, ensuring complete privacy.
+
+### ⚙️ Server-Side Rendering (SSR)
+Faster initial loads, improved SEO, and secure data handling.
+
+### 🌓 Dark Mode UI
+The interface is optimized for a smooth, clean dark experience.
+
+---
+
+## 🚧 Getting Started
+
+### Environment Variables
+
+Create a `.env.local` file in the root directory:
+
+```dotenv
+UPSTASH_REDIS_REST_URL="your_redis_url"
+UPSTASH_REDIS_REST_TOKEN="your_redis_token"
+```
+
+### Run Development Server
 
 ```bash
 npm run dev
@@ -14,23 +57,20 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Edit files inside `app/` — changes update automatically.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 📘 Learn More About Next.js
 
-To learn more about Next.js, take a look at the following resources:
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Next.js Learn Tutorial](https://nextjs.org/learn)
+- [Next.js GitHub Repository](https://github.com/vercel/next.js)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🚀 Deploy on Vercel
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Deploy instantly using Vercel: [https://vercel.com/new?filter=next.js](https://vercel.com/new?filter=next.js)
