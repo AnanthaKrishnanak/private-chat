@@ -34,7 +34,7 @@ const deleteRoom = async (roomId: string) => {
   await Promise.all([
     redis.del(getMessagesKey(roomId)),
     redis.del(getRoomKey(roomId)),
-    redis.del(getHistoryKey(roomId)),
+    redis.del(roomId),
   ]);
 
   await realtime.channel(roomId).emit("chat.destroyRoom", { isDeleted: true });
