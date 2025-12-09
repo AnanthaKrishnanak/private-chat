@@ -66,6 +66,10 @@ const errorMap: Record<string, { title: string; description: string }> = {
     title: "Room Full",
     description: "The room is full. Create a new room",
   },
+  "room-expired": {
+    title: "Room Expired",
+    description: "The room has expired. Create a new room",
+  },
 };
 export default function Home() {
   const searchParams = useSearchParams();

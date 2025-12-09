@@ -7,20 +7,34 @@ import { Message, messageSchema } from "@/schema";
 
 const TIME_TO_LIVE = 60 * 10; // 10 minutes
 
-const rooms = new Elysia({ prefix: "/rooms" }).post("/create", async () => {
-  const roomId = nanoid();
+const rooms = new Elysia({ prefix: "/rooms" })
+  .post("/create", async () => {
+    const roomId = nanoid();
 
-  await redis.hset(`meta-${roomId}`, {
-    createdAt: Date.now(),
-    connectedUsers: [],
-  });
+    await redis.hset(`meta-${roomId}`, {
+      createdAt: Date.now(),
+      connectedUsers: [],
+    });
 
-  await redis.expire(`meta-${roomId}`, TIME_TO_LIVE);
+    await redis.expire(`meta-${roomId}`, TIME_TO_LIVE);
 
-  return {
-    roomId,
-  };
-});
+    return {
+      roomId,
+    };
+  })
+  .get(
+    "/ttl",
+    async ({ query }) => {
+      const roomId = query.roomId;
+      const ttl = await redis.ttl(`meta-${roomId}`);
+      return { ttl: ttl > 0 ? ttl : 0 };
+    },
+    {
+      query: z.object({
+        roomId: z.string(),
+      }),
+    }
+  );
 
 const messages = new Elysia({ prefix: "/messages" })
   .use(authMiddleWare)
@@ -51,6 +65,7 @@ const messages = new Elysia({ prefix: "/messages" })
       body: messageSchema.pick({ text: true, sender: true }),
     }
   )
+  .use(authMiddleWare)
   .get("/", async ({ auth }) => {
     const { roomId } = auth;
     const messages = await redis.lrange<Message>(`messages-${roomId}`, 0, -1);

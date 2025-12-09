@@ -1,21 +1,18 @@
 "use client";
 
+import Timer from "@/components/timer";
 import { useMessages } from "@/hooks/useMessages";
-import { Check, Copy, Lock, Timer, Trash2 } from "lucide-react";
+import { useTTL } from "@/hooks/useTTL";
+import { Check, Copy, Lock, Trash2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import React, { useState } from "react";
-
-function formatTimeRemaining(timeRemaining: number) {
-  const minutes = Math.floor(timeRemaining / 60);
-  const seconds = timeRemaining % 60;
-  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-}
 
 function Layout({ children }: { children: React.ReactNode }) {
   const { roomId } = useParams();
   const [copied, setCopied] = useState(false);
 
-  const { data: messages = [], isLoading } = useMessages();
+  const { data: messages = [], isLoading: isMessagesLoading } = useMessages();
+  const { data: ttl, isLoading: isTTLLoading } = useTTL();
 
   const handleCopy = async () => {
     try {
@@ -57,12 +54,7 @@ function Layout({ children }: { children: React.ReactNode }) {
             <span className="text-xs font-medium text-zinc-500 uppercase mb-1">
               Auto-Destruct
             </span>
-            <div className="flex items-center gap-2 text-rose-500 bg-rose-500/10 px-3 py-1 rounded-full border border-rose-500/20">
-              <Timer className="w-4 h-4 animate-pulse" />
-              <span className="font-mono text-lg font-medium tracking-widest">
-                00:10:00
-              </span>
-            </div>
+            <Timer />
           </div>
 
           <button className="group flex items-center gap-2 px-4 py-2 bg-zinc-900 hover:bg-rose-950/30 border border-zinc-800 hover:border-rose-500/30 text-zinc-400 hover:text-rose-400 rounded-lg transition-all">
@@ -84,9 +76,6 @@ function Layout({ children }: { children: React.ReactNode }) {
             <span className="text-sm text-zinc-500">
               {messages.length} messages
             </span>
-          </div>
-          <div className="md:hidden text-rose-500 font-mono text-sm">
-            00:10:00
           </div>
         </div>
       </header>
